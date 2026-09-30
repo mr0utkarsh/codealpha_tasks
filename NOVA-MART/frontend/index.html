@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0B0B0F" />
+    <meta
+      name="description"
+      content="NOVA MART - a premium online store for considered tech, watches, sneakers and home essentials. Curated products, fast delivery, simple returns."
+    />
+    <title>NOVA MART - Curated Premium Store</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230B0B0F'/%3E%3Cpath d='M16 6.5l2.1 7.4 7.4 2.1-7.4 2.1L16 25.5l-2.1-7.4-7.4-2.1 7.4-2.1L16 6.5z' fill='%237C5CFF'/%3E%3C/svg%3E"
+    />
+
+    <script>
+      // Apply the persisted colour scheme before first paint to avoid a flash.
+      (function applyStoredTheme() {
+        try {
+          var stored = localStorage.getItem('novamart.theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var useDark = stored ? stored === 'dark' : prefersDark;
+          document.documentElement.classList.toggle('dark', useDark);
+        } catch (error) {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

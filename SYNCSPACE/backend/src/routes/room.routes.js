@@ -1,0 +1,20 @@
+import { Router } from "express";
+import { joinRoom, leaveRoom } from "../controllers/room.controller.js";
+import { createRoom, deleteRoom, getRoom, listRooms } from "../controllers/room.controller.js";
+import { listFiles, upload, uploadFile } from "../controllers/file.controller.js";
+import { listMessages, postMessage } from "../controllers/message.controller.js";
+import { validate } from "../middleware/validate.js";
+import { createRoomSchema } from "../validators/room.schema.js";
+
+const router = Router();
+router.get("/", listRooms);
+router.post("/", validate(createRoomSchema), createRoom);
+router.get("/:roomCode", getRoom);
+router.delete("/:roomCode", deleteRoom);
+router.post("/:roomCode/join", joinRoom);
+router.post("/:roomCode/leave", leaveRoom);
+router.get("/:roomCode/messages", listMessages);
+router.post("/:roomCode/messages", postMessage);
+router.get("/:roomCode/files", listFiles);
+router.post("/:roomCode/files", upload.single("file"), uploadFile);
+export default router;

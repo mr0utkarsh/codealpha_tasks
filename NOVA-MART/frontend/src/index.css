@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-canvas-light text-ink-900 antialiased dark:bg-canvas-dark dark:text-ink-50;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight text-ink-950 dark:text-white;
+  }
+
+  ::selection {
+    @apply bg-brand-500/25;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500/70 ring-offset-2 ring-offset-canvas-light dark:ring-offset-canvas-dark;
+  }
+
+  /* Slimmer, theme aware scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(185 185 196) transparent;
+  }
+
+  .dark * {
+    scrollbar-color: rgb(67 67 77) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full border-4 border-solid border-transparent bg-ink-300 bg-clip-content dark:bg-ink-700;
+  }
+}
+
+@layer components {
+  /* Shimmer used by skeleton loaders */
+  .skeleton {
+    @apply relative overflow-hidden rounded-xl bg-ink-100 dark:bg-ink-800/70;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/5;
+    animation: shimmer 1.6s infinite;
+  }
+
+  /* Keeps horizontal rails tidy on touch devices */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Frosted surface used by the sticky header and mobile sheets */
+  .surface-blur {
+    @apply bg-white/85 backdrop-blur-xl backdrop-saturate-150 dark:bg-canvas-dark/85;
+  }
+
+  .hairline {
+    @apply border-ink-200/70 dark:border-ink-800/80;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .clamp-1,
+  .clamp-2,
+  .clamp-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .clamp-1 {
+    -webkit-line-clamp: 1;
+  }
+
+  .clamp-2 {
+    -webkit-line-clamp: 2;
+  }
+
+  .clamp-3 {
+    -webkit-line-clamp: 3;
+  }
+
+  .animate-delay-1 {
+    animation-delay: 60ms;
+  }
+
+  .animate-delay-2 {
+    animation-delay: 120ms;
+  }
+
+  .animate-delay-3 {
+    animation-delay: 180ms;
+  }
+
+  .animate-delay-4 {
+    animation-delay: 240ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

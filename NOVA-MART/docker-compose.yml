@@ -1,0 +1,27 @@
+# Optional: spin up a PostgreSQL instance for NOVA MART with one command.
+#
+#   docker compose up -d
+#
+# Then set backend/.env -> DATABASE_URL="postgresql://nova:nova@localhost:5432/novamart?schema=public"
+# (the credentials below match the example .env shipped with this project)
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: nova-mart-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nova
+      POSTGRES_PASSWORD: nova
+      POSTGRES_DB: novamart
+    ports:
+      - '5432:5432'
+    volumes:
+      - nova-mart-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U nova -d novamart']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nova-mart-pgdata:

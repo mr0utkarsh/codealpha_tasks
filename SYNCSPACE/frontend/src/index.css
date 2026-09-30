@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root { color-scheme: dark; }
+body { @apply bg-slate-950 text-slate-100 antialiased; }
+.panel { @apply rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur; }
+.btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:opacity-50; }
+.btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm hover:bg-white/10; }
+.input { @apply w-full rounded-xl border border-white/10 bg-slate-900/80 px-3.5 py-2.5 text-sm outline-none placeholder:text-slate-500 focus:border-cyan-300/60; }
+.label { @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400; }
+.call-btn { @apply flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300; }
+.call-btn-active { @apply border-transparent bg-cyan-400 text-slate-950 hover:bg-cyan-300; }
+.call-btn-danger { @apply border-transparent bg-rose-500 text-white hover:bg-rose-400; }
+.call-btn-off { @apply border-transparent bg-rose-500/90 text-white hover:bg-rose-400; }
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 999px; }

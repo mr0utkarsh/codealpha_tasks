@@ -1,0 +1,18 @@
+import { PrismaClient } from "../backend/node_modules/@prisma/client/default.js";
+const p = new PrismaClient();
+const users = await p.user.count();
+const rooms = await p.room.count();
+const parts = await p.roomParticipant.count();
+const msgs = await p.message.count();
+const files = await p.sharedFile.count();
+console.log("users:        ", users);
+console.log("rooms:        ", rooms);
+console.log("participants: ", parts);
+console.log("messages:     ", msgs);
+console.log("sharedFiles:  ", files);
+const r = await p.room.findFirst({ where: { roomCode: "ABCD-1234" } });
+console.log("seed room:    ", r ? r.name : "MISSING");
+const u = await p.user.findFirst({ where: { email: "alice@syncspace.dev" } });
+console.log("alice hash:   ", u ? u.password.slice(0, 7) + "... (len " + u.password.length + ")" : "MISSING");
+console.log("plaintext leak:", u ? String(u.password).includes("password123") : "n/a");
+await p.$disconnect();

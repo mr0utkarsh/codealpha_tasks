@@ -1,0 +1,27 @@
+# Normalise line endings in the repository, and check them out as the
+# platform default on each developer machine.
+* text=auto
+
+*.js   text diff=javascript
+*.jsx  text diff=javascript
+*.mjs  text diff=javascript
+*.cjs  text diff=javascript
+*.ts   text diff=typescript
+*.tsx  text diff=typescript
+*.json text
+*.css  text
+*.html text
+*.md   text
+*.yml  text
+*.yaml text
+*.sql  text
+*.prisma text
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.woff  binary
+*.woff2 binary
