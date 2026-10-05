@@ -2,172 +2,122 @@
 
 **Developer:** Utkarsh Giri
 
-A monorepo containing three full-stack web applications built during the CodeAlpha
-Full Stack Development Internship. Each project is a self-contained
-`backend/` (Node.js + Express + Prisma + PostgreSQL) and `frontend/`
-(React + Vite + Tailwind CSS) application with JWT authentication.
+A monorepo containing three full-stack production-ready web applications built during the CodeAlpha Full Stack Development Internship. Each project is a self-contained Node.js + Express + Prisma + PostgreSQL backend and React + Vite + Tailwind CSS frontend with JWT authentication.
 
 ---
 
-## Projects
+## Projects Overview
 
-| Project | Category | Stack |
+| Project | Category | Tech Stack |
 | --- | --- | --- |
-| [NOVA MART](#nova-mart) | E-commerce store | React 19, Vite 8, Tailwind, Express 5, Prisma, PostgreSQL |
-| [SYNCSPACE](#syncspace) | Real-time communication | React 18, Vite, Tailwind, Express 5, Socket.IO, WebRTC, Prisma, PostgreSQL |
-| [FLOWBOARD](#flowboard) | Project management | React 18, Vite, Tailwind, Express 5, Prisma, PostgreSQL, Zod |
+| **NOVA MART** | E-commerce | React 19, Vite 8, Tailwind, Express 5, Prisma 6, PostgreSQL |
+| **SYNCSPACE** | Real-time Communication | React 18, Vite 5, Tailwind, Socket.IO, WebRTC, Express 5, Prisma 6, PostgreSQL |
+| **FLOWBOARD** | Project Management | React 18, Vite 5, Tailwind, Framer Motion, Express 5, Prisma 6, PostgreSQL |
 
 ---
 
-## NOVA MART
+## NOVA MART — E-Commerce Store
 
-A storefront for a general-merchandise catalog, with search, filtering, sorting, a
-persistent cart and wishlist, and a full checkout and order-history flow.
+A production-style storefront with full-text search, filtering, sorting, persistent cart and wishlist, checkout with stock reservation, order history, and role-based admin features.
 
 ### Features
+- **Storefront** — hero section, featured and trending products, product detail pages
+- **Search & Filter** — full-text search across name/brand/category/description; filter by category, brand, price, stock, featured/trending
+- **Sorting** — relevance, newest, price (asc/desc), rating, popularity, name
+- **Cart & Wishlist** — persistent cart (merged for guest + signed-in users), wishlist with toggle
+- **Checkout** — full validation, stock reservation, atomic order creation via transaction
+- **Order History** — order detail, cancellation, order statistics
+- **Profile** — manage account, change password
+- **Admin Panel** — product CRUD, order status updates, view all orders (role-gated server-side)
+- **AI Search Assist** — refines query against live catalog
 
-- Storefront homepage with hero, featured and trending sections
-- Product listing with full-text search across name, brand, category and description
-- Filtering by category, brand, price range, stock, featured and trending
-- Sorting by relevance, newest, price (ascending/descending), rating, popularity and name
-- Product detail pages addressed by id or slug, with related products
-- Persistent cart with quantity control, merged for guest and signed-in shoppers
-- Wishlist with add, add-many, toggle and remove
-- Checkout with stock reservation and atomic order creation inside a transaction
-- Order history with order detail, cancellation and order statistics
-- Profile management including password change
-- Role-based access control: a `USER` and an `ADMIN` role enforced server-side, where
-  only admins can create, update or delete products, update order status, or read all
-  orders via `?scope=all`
-- AI search assist that refines a query against the live catalog
-
-### Technologies
-
-React 19, Vite 8, Tailwind CSS 3, React Router 7, Node.js, Express 5, Prisma 6,
-PostgreSQL, JSON Web Tokens, bcrypt, Zod
-
-### Repository
-
-- Source: [`NOVA-MART/`](./NOVA-MART)
+### Tech
+React 19, Vite 8, Tailwind CSS 3, React Router 7, Node.js, Express 5, Prisma 6, PostgreSQL, JWT, bcrypt, Zod validation
 
 ### Links
-
-- GitHub: _pending_
-- Live: _pending_
+- **Source:** [`NOVA-MART/`](./NOVA-MART)
 
 ---
 
-## SYNCSPACE
+## SYNCSPACE — Real-Time Communication
 
-Real-time rooms for messaging, audio and video calls, screen sharing, file sharing
-and a shared whiteboard.
+Real-time rooms for group messaging, peer-to-peer audio/video calls (WebRTC), screen sharing, file sharing, and collaborative whiteboard.
 
 ### Features
+- **Authentication** — email/password with JWT sessions
+- **Rooms** — generated join codes, membership tracking, ownership
+- **Chat** — real-time group messaging over Socket.IO, persisted to PostgreSQL
+- **Audio & Video** — peer-to-peer over WebRTC in full mesh topology
+- **Media Controls** — mute camera/microphone, broadcast to all participants
+- **Screen Sharing** — getDisplayMedia, replace outgoing video, return to camera when done
+- **Participants Panel** — show each user's name, audio/camera/screen state, live connection status
+- **File Sharing** — upload with progress, MIME/extension filters, size caps
+- **Collaborative Whiteboard** — broadcast strokes and clear events to room
+- **AI Features** — chat summarization, message rewriting (5 tones), reply suggestions
 
-- Email/password authentication with JWT sessions
-- Rooms with generated join codes, membership tracking and ownership
-- Real-time group chat over Socket.IO, persisted to PostgreSQL
-- Peer-to-peer audio and video over WebRTC in a full mesh topology
-- Camera and microphone mute toggles, broadcast live to every participant
-- Screen sharing through `getDisplayMedia`, replacing the outgoing video track and
-  returning to the camera when sharing stops
-- Participant panel showing each user's name, audio, camera and screen state
-- Live connection status indicator for the Socket.IO link
-- File sharing with upload progress, enforced MIME and extension filters, and a size cap
-- Collaborative whiteboard broadcasting strokes and clear events to the room
-- AI chat summarise, message rewriting across five tones, and reply suggestions
+### Tech
+React 18, Vite 5, Tailwind CSS 3, React Router 6, Node.js, Express 5, Socket.IO 4, WebRTC, Multer, Prisma 6, PostgreSQL, JWT, bcrypt, Zod validation
 
-### Technologies
-
-React 18, Vite 5, Tailwind CSS 3, React Router 6, Node.js, Express 5, Socket.IO 4,
-WebRTC, Multer, Prisma 6, PostgreSQL, JSON Web Tokens, bcrypt, Zod
-
-### Known limitations
-
-- WebRTC uses public STUN servers only. There is no TURN relay, so peers behind
-  symmetric NAT or restrictive firewalls may fail to connect.
-- Shared files are stored on the server's local disk rather than in object storage, so
-  uploads do not survive a redeploy or scale-out.
-- There is no renegotiation path, so a peer connection created before local media
-  resolves may not carry media.
-
-### Repository
-
-- Source: [`SYNCSPACE/`](./SYNCSPACE)
+### Known Limitations
+- WebRTC uses public STUN servers only; no TURN relay (peers behind symmetric NAT may fail)
+- Files stored on server disk, not object storage (uploads don't survive redeploy/scale-out)
+- No renegotiation path for peer connections created before local media resolves
 
 ### Links
-
-- GitHub: _pending_
-- Live: _pending_
+- **Source:** [`SYNCSPACE/`](./SYNCSPACE)
 
 ---
 
-## FLOWBOARD
+## FLOWBOARD — Project Management
 
-A workspace for managing projects, teams and tasks on a Kanban board.
+A workspace for managing projects, teams, and tasks on a Kanban board with real-time dashboard stats and activity feeds.
 
 ### Features
+- **Authentication** — email/password with JWT sessions
+- **Dashboard** — aggregated project/task/activity statistics, completion bar, recent activity, recent projects
+- **Projects** — status tracking (PLANNING, ACTIVE, ON_HOLD, COMPLETED), search, filter, sort
+- **Team Directory** — cross-project user search
+- **Membership** — per-project roles (OWNER, ADMIN, MEMBER), enforced on all operations
+- **Kanban Board** — four columns (TODO, IN_PROGRESS, IN_REVIEW, DONE), drag-and-drop with optimistic updates and rollback
+- **Tasks** — priorities (LOW, MEDIUM, HIGH, URGENT), due dates, assignees, per-task comments
+- **Activity Feed** — records project, member, task, and comment events
+- **Search & Filter** — across projects and tasks
+- **Dark/Light Theme** — persistent theme preference
+- **AI Assistance** — generate project descriptions, task descriptions, draft comments by intent, suggest tasks
 
-- Email/password authentication with JWT sessions
-- Dashboard with aggregated project, task and activity statistics
-- Projects with status tracking (`PLANNING`, `ACTIVE`, `ON_HOLD`, `COMPLETED`)
-- Team directory with cross-project user search
-- Per-project membership with `OWNER`, `ADMIN` and `MEMBER` roles, enforced on every
-  project, task and comment operation
-- Kanban board with four columns - `TODO`, `IN_PROGRESS`, `IN_REVIEW`, `DONE` - and
-  drag and drop between them, persisted with optimistic updates and rollback
-- Tasks with priorities (`LOW`, `MEDIUM`, `HIGH`, `URGENT`), due dates and assignees
-- Comments on tasks, with author-only deletion
-- Activity feed recording project, member, task and comment events
-- Search and filtering across projects and tasks
-- Dark and light themes
-- AI assistance for project descriptions, task descriptions, comment drafting by intent,
-  and task suggestions
+### Tech
+React 18, Vite 5, Tailwind CSS 3, React Router 6, Framer Motion, Node.js, Express 5, Prisma 6, PostgreSQL, JWT, bcrypt, Zod, Helmet, express-rate-limit
 
-### Technologies
-
-React 18, Vite 5, Tailwind CSS 3, React Router 6, Framer Motion, Node.js, Express 5,
-Prisma 6, PostgreSQL, JSON Web Tokens, bcrypt, Zod, Helmet, express-rate-limit
-
-### Known limitations
-
-- Kanban drag and drop uses the native HTML5 drag-and-drop API, so it does not work
-  with touch input on mobile browsers. Tasks can still be moved by status from the task
-  detail view.
-- Shared files in SYNCSPACE, not FLOWBOARD: FLOWBOARD has no file storage.
-
-### Repository
-
-- Source: [`FLOWBOARD/`](./FLOWBOARD)
+### Known Limitations
+- Kanban drag-and-drop uses HTML5 drag-and-drop API (no touch support on mobile); tasks can be moved via task detail view
+- No file storage in FLOWBOARD (shared files in SYNCSPACE only)
 
 ### Links
-
-- GitHub: _pending_
-- Live: _pending_
+- **Source:** [`FLOWBOARD/`](./FLOWBOARD)
 
 ---
 
-## Repository layout
+## Repository Layout
 
 ```
 codealpha_tasks/
 ├── NOVA-MART/
-│   ├── backend/       Express + Prisma REST API
-│   └── frontend/      React + Vite storefront
+│   ├── backend/            # Express + Prisma REST API
+│   └── frontend/           # React + Vite storefront
 ├── SYNCSPACE/
-│   ├── backend/       Express + Socket.IO + WebRTC signaling API
-│   └── frontend/      React + Vite client
+│   ├── backend/            # Express + Socket.IO + WebRTC signaling
+│   └── frontend/           # React + Vite client
 ├── FLOWBOARD/
-│   ├── backend/       Express + Prisma REST API
-│   └── frontend/      React + Vite workspace
+│   ├── backend/            # Express + Prisma REST API
+│   └── frontend/           # React + Vite workspace
 └── README.md
 ```
 
 ---
 
-## Running a project locally
+## Getting Started
 
-Each project follows the same shape.
+Each project follows the same setup pattern:
 
 ```bash
 # 1. Install dependencies
@@ -175,60 +125,58 @@ cd NOVA-MART/backend && npm install
 cd ../frontend && npm install
 
 # 2. Configure environment
-cp .env.example .env      # backend, then fill in DATABASE_URL and JWT_SECRET
-cp .env.example .env      # frontend, then set VITE_API_URL if needed
+cp .env.example .env        # backend, fill in DATABASE_URL and JWT_SECRET
+cp .env.example .env        # frontend, set VITE_API_URL if needed
 
-# 3. Create the database schema and seed it
+# 3. Create database and seed
 cd ../backend
 npm run db:migrate
 npm run db:seed
 
-# 4. Start the backend (default ports: NOVA MART 5000, SYNCSPACE 5004, FLOWBOARD 5001)
+# 4. Start the backend (ports: NOVA MART 5000, SYNCSPACE 5004, FLOWBOARD 5001)
 npm run dev
 
-# 5. Start the frontend in a second terminal
+# 5. Start the frontend (in another terminal)
 cd ../frontend && npm run dev
 ```
 
-Each backend also ships an embedded PostgreSQL for local development, so a local
-database is not required:
+Each backend includes an embedded PostgreSQL for local development (zero-config):
 
 ```bash
 cd backend && npm run db:local
 ```
 
-The API health endpoint for each project is `GET /api/health`.
+**API Health Endpoint:** `GET /api/health`
 
 ---
 
 ## Security
 
-- `.env` files are excluded by `.gitignore` and are never committed. Only `.env.example`
-  files with empty placeholders are tracked.
-- Passwords are hashed with bcrypt. Password hashes are excluded from API responses by
-  the Prisma select used for public user shapes.
-- JWTs are signed with a secret that the backend refuses to start without when it is
-  shorter than 32 characters.
-- Request bodies are validated with Zod.
-- CORS is an explicit origin allowlist configured with `CORS_ORIGIN`.
-- Helmet sets security headers, and rate limiting is applied to the API and to
-  authentication routes.
-- File uploads are constrained by MIME type, extension and size.
-- AI provider keys are optional server-side variables and are never exposed through
-  `VITE_*` build variables.
+- `.env` files excluded by `.gitignore` and never committed; only `.env.example` with placeholders tracked
+- Passwords hashed with **bcrypt**; hashes excluded from API responses
+- JWT signed with a secret that backend refuses to start without if shorter than 32 characters
+- Request bodies validated with **Zod**
+- CORS is an explicit origin allowlist configured with `CORS_ORIGIN`
+- **Helmet** sets security headers; rate limiting applied to API and auth routes
+- File uploads constrained by MIME type, extension, and size
+- AI provider keys optional server-side only; never exposed through `VITE_*` variables
 
-## Environment variables
+---
 
-Every variable used by any project is listed in each project's `.env.example`. In
-summary:
+## Environment Variables
 
-**Backend:** `NODE_ENV`, `PORT`, `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`,
-`CORS_ORIGIN`, plus `BCRYPT_ROUNDS`, `FREE_SHIPPING_THRESHOLD` and `SHIPPING_FEE`
-(NOVA MART) and `MAX_FILE_MB` (SYNCSPACE).
+Every variable used is listed in each project's `.env.example`.
 
-**Optional AI providers:** `GEMINI_API_KEY`, `GROQ_API_KEY`. Each backend tries Gemini
-first and falls back to Groq, and degrades to HTTP 503 when neither key is configured.
+**Backend:** `NODE_ENV`, `PORT`, `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CORS_ORIGIN`, plus project-specific vars
 
-**Frontend:** `VITE_API_URL`, the public API origin. No secret is ever placed in a
-`VITE_*` variable, because everything prefixed with `VITE_` is compiled into the
-browser bundle.
+**Optional AI Providers:** `GEMINI_API_KEY`, `GROQ_API_KEY` (each backend tries Gemini first, falls back to Groq, degrades gracefully when neither configured)
+
+**Frontend:** `VITE_API_URL` (public API origin; no secrets ever placed in `VITE_*` variables)
+
+---
+
+## License
+
+Built for the **CodeAlpha Full Stack Development Internship**.
+
+*Built with attention to security, real data, and thoughtful design.*
