@@ -78,7 +78,12 @@ export const deleteRoom = asyncHandler(async (req, res) => {
 });
 
 export const joinRoom = asyncHandler(async (req, res) => {
-  const roomCode = normalizeRoomCode(req.params.roomCode);
+  const rawCode = normalizeRoomCode(req.params.roomCode);
+  // Reject codes that still contain whitespace (e.g. "%20" decoded by some
+  // proxies) BEFORE the DB lookup so the client gets a loud 400 that says the
+  // code itself is malformed - not a misleading "Room not found".
+  if (/\s/.test(rawCode)) throw ApiError.badRequest("Invalid room code format. Expected XXXX-XXXX (A-Z, 0-9).");
+  const roomCode = rawCode;
   const room = await prisma.room.findUnique({ where: { roomCode } });
   if (!room) throw ApiError.notFound("Room not found. Check the room ID and try again.");
   await prisma.roomParticipant.upsert({
