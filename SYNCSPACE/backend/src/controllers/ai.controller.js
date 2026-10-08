@@ -9,12 +9,13 @@ import {
 import { requireAuth } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { ApiError } from '../lib/ApiError.js';
+import { normalizeRoomCode } from '../lib/roomCode.js';
 
 export const summarizeChat = asyncHandler(async (req, res) => {
-  const { roomCode } = req.params;
+  const roomCode = normalizeRoomCode(req.params.roomCode);
   const { limit = 50 } = req.query;
 
-  const room = await prisma.room.findUnique({ where: { roomCode: roomCode.toUpperCase() } });
+  const room = await prisma.room.findUnique({ where: { roomCode } });
   if (!room) throw ApiError.notFound('Room not found');
 
   const membership = await prisma.roomParticipant.findUnique({
@@ -62,10 +63,10 @@ export const rewriteMessage = asyncHandler(async (req, res) => {
 });
 
 export const suggestReplies = asyncHandler(async (req, res) => {
-  const { roomCode } = req.params;
+  const roomCode = normalizeRoomCode(req.params.roomCode);
   const { limit = 20 } = req.query;
 
-  const room = await prisma.room.findUnique({ where: { roomCode: roomCode.toUpperCase() } });
+  const room = await prisma.room.findUnique({ where: { roomCode } });
   if (!room) throw ApiError.notFound('Room not found');
 
   const membership = await prisma.roomParticipant.findUnique({

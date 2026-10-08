@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-import api, { API_BASE } from "../lib/api.js";
+import api, { API_BASE, API_BASE_ERROR, normalizeRoomCode } from "../lib/api.js";
 
 const ICE_SERVERS = [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }];
 
@@ -22,8 +22,7 @@ export function useRoom(roomCode, user) {
   const audioCtxRef = useRef(null);
   const speakingRef = useRef(new Map());
   const stopAnalyseRef = useRef(new Map());
-  roomRef.current = roomCode;
-  roomRef.current = roomCode;
+  roomRef.current = normalizeRoomCode(roomCode);
 
   // Real speaking detection: an AnalyserNode per remote stream measuring actual
   // audio energy. This is NOT simulated - a silent stream never lights up.
@@ -112,6 +111,14 @@ export function useRoom(roomCode, user) {
 
   useEffect(() => {
     if (!roomCode || !user) return;
+    // Socket.IO must hit the same backend origin as the REST API. In production
+    // that is VITE_API_URL - never the static frontend host.
+    if (!API_BASE) {
+      setSocketStatus("disconnected");
+      setMediaError(API_BASE_ERROR || "API URL is not configured.");
+      return;
+    }
+    const code = normalizeRoomCode(roomCode);
     let cancelled = false;
     const socket = io(API_BASE, { auth: { token: localStorage.getItem("syncspace_token") || "" }, transports: ["websocket", "polling"] });
     socketRef.current = socket;
@@ -133,7 +140,7 @@ export function useRoom(roomCode, user) {
     // socket handshake race each other. If the socket arrives first the server
     // rejects it as a non-member, so we establish membership and retry once.
     const joinWithRetry = (attempt = 0) => {
-      socket.emit("room:join", { roomCode }, async (res) => {
+      socket.emit("room:join", { roomCode: code }, async (res) => {
         if (res?.ok) {
           setMediaError("");
           if (res.participants?.length) {
@@ -144,7 +151,7 @@ export function useRoom(roomCode, user) {
         }
         const notMember = /member/i.test(res?.error ?? "");
         if (notMember && attempt < 3) {
-          try { await api.joinRoom(roomCode); } catch { /* retry anyway */ }
+          try { await api.joinRoom(code); } catch { /* retry anyway */ }
           setTimeout(() => { if (!cancelled) joinWithRetry(attempt + 1); }, 400 * (attempt + 1));
           return;
         }
@@ -196,7 +203,7 @@ export function useRoom(roomCode, user) {
 
     return () => {
       cancelled = true;
-      try { socket.emit("room:leave", { roomCode }); } catch {}
+      try { socket.emit("room:leave", { roomCode: code }); } catch {}
       socket.disconnect();
       peersRef.current.forEach((pc) => { try { pc.close(); } catch {} });
       peersRef.current.clear();

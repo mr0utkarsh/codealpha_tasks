@@ -7,8 +7,21 @@ import { initSocket } from "./socket/index.js";
 
 const app = createApp();
 const httpServer = createServer(app);
+// Socket.IO must accept the same origins as the REST API: the configured
+// allowlist (production Vercel origin) plus any localhost origin in dev.
+const socketCors = {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+    const isAllowed =
+      env.corsOrigins.includes(origin) ||
+      (env.isDevelopment && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin));
+    if (isAllowed) return callback(null, true);
+    return callback(new Error("Origin " + origin + " is not allowed by CORS."));
+  },
+  credentials: true,
+};
 const io = new Server(httpServer, {
-  cors: { origin: env.corsOrigins, credentials: true },
+  cors: socketCors,
   maxHttpBufferSize: 2e6,
 });
 initSocket(io);

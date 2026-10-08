@@ -1,6 +1,7 @@
 import { ApiError } from "../lib/ApiError.js";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import prisma from "../lib/prisma.js";
+import { normalizeRoomCode } from "../lib/roomCode.js";
 import { ok } from "../lib/respond.js";
 
 function sanitize(content) {
@@ -8,7 +9,7 @@ function sanitize(content) {
 }
 
 export const listMessages = asyncHandler(async (req, res) => {
-  const room = await prisma.room.findUnique({ where: { roomCode: req.params.roomCode } });
+  const room = await prisma.room.findUnique({ where: { roomCode: normalizeRoomCode(req.params.roomCode) } });
   if (!room) throw ApiError.notFound("Room not found.");
   const membership = await prisma.roomParticipant.findUnique({
     where: { roomId_userId: { roomId: room.id, userId: req.user.id } },
@@ -27,7 +28,7 @@ export const listMessages = asyncHandler(async (req, res) => {
 export const postMessage = asyncHandler(async (req, res) => {
   const content = sanitize(req.body?.content);
   if (!content) throw ApiError.badRequest("Message content is required.");
-  const room = await prisma.room.findUnique({ where: { roomCode: req.params.roomCode } });
+  const room = await prisma.room.findUnique({ where: { roomCode: normalizeRoomCode(req.params.roomCode) } });
   if (!room) throw ApiError.notFound("Room not found.");
   const membership = await prisma.roomParticipant.findUnique({
     where: { roomId_userId: { roomId: room.id, userId: req.user.id } },

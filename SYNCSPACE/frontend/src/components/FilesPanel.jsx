@@ -7,6 +7,10 @@ export function formatSize(bytes) {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
   return (bytes / 1024 / 1024).toFixed(1) + " MB";
 }
+export function fileHref(fileUrl) {
+  if (!API_BASE) return "#";
+  return API_BASE + fileUrl;
+}
 export default function FilesPanel({ roomCode, files, setFiles, notify, onShared }) {
   const inputRef = useRef(null);
   const [progress, setProgress] = useState(0);
@@ -41,7 +45,7 @@ export default function FilesPanel({ roomCode, files, setFiles, notify, onShared
               <div className="truncate text-sm font-medium" title={f.fileName}>{f.fileName}</div>
               <div className="text-xs text-slate-400">{formatSize(f.fileSize)} - {f.user?.name || "Member"}</div>
             </div>
-            <a href={API_BASE + f.fileUrl} target="_blank" rel="noreferrer" aria-label={"Download " + f.fileName} className="btn-ghost !px-2.5 !py-1.5"><Download size={14} /></a>
+            <a href={fileHref(f.fileUrl)} target="_blank" rel="noreferrer" aria-label={"Download " + f.fileName} className="btn-ghost !px-2.5 !py-1.5"><Download size={14} /></a>
           </div>
         ))}
       </div>

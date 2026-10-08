@@ -5,6 +5,7 @@ import { env } from "../config/env.js";
 import { ApiError } from "../lib/ApiError.js";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import prisma from "../lib/prisma.js";
+import { normalizeRoomCode } from "../lib/roomCode.js";
 import { created, ok } from "../lib/respond.js";
 
 const uploadDir = path.resolve("uploads");
@@ -44,7 +45,7 @@ export const upload = multer({
 });
 
 export const listFiles = asyncHandler(async (req, res) => {
-  const room = await prisma.room.findUnique({ where: { roomCode: req.params.roomCode } });
+  const room = await prisma.room.findUnique({ where: { roomCode: normalizeRoomCode(req.params.roomCode) } });
   if (!room) throw ApiError.notFound("Room not found.");
   const membership = await prisma.roomParticipant.findUnique({
     where: { roomId_userId: { roomId: room.id, userId: req.user.id } },
@@ -60,7 +61,7 @@ export const listFiles = asyncHandler(async (req, res) => {
 });
 
 export const uploadFile = asyncHandler(async (req, res) => {
-  const room = await prisma.room.findUnique({ where: { roomCode: req.params.roomCode } });
+  const room = await prisma.room.findUnique({ where: { roomCode: normalizeRoomCode(req.params.roomCode) } });
   if (!room) throw ApiError.notFound("Room not found.");
   const membership = await prisma.roomParticipant.findUnique({
     where: { roomId_userId: { roomId: room.id, userId: req.user.id } },

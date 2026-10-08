@@ -33,10 +33,46 @@ CodeAlpha Full Stack Internship Task 4: real-time communication app with WebRTC 
 - SharedFile(id, roomId, userId, fileName, fileUrl, fileSize, mimeType, createdAt)
 
 ## Environment variables
-Backend/backend/.env:
+Backend/backend/.env (see backend/.env.example):
 - DATABASE_URL, JWT_SECRET (32+ chars), JWT_EXPIRES_IN=7d, PORT=5004, NODE_ENV=development, CORS_ORIGIN=http://localhost:5174, MAX_FILE_MB=25
-Frontend/frontend/.env:
+Frontend/frontend/.env (see frontend/.env.example):
 - VITE_API_URL=http://localhost:5004
+
+## Production deployment (split architecture)
+Vercel hosts ONLY the static React/Vite frontend. The Node.js + Express +
+Socket.IO server must run on a persistent Node host (Render/Railway). The
+Vercel static site does NOT serve the REST API or Socket.IO - so the frontend
+must never fall back to window.location.origin in production.
+
+### Backend (Render or Railway)
+- Root directory: `SYNCSPACE/backend`
+- Build command: `npm install && npm run build && npm run db:deploy`
+  (`build` = `prisma generate`, `db:deploy` = `prisma migrate deploy`)
+- Start command: `npm start`  (runs `node src/server.js`)
+- Environment:
+  - NODE_ENV=production
+  - PORT=5004 (or leave to the host - Render/Railway inject PORT; the server reads it)
+  - DATABASE_URL=<your managed PostgreSQL connection string, same DB for all devices>
+  - JWT_SECRET=<32+ char random string, never reuse the frontend or commit it>
+  - CORS_ORIGIN=https://codealpha-syncspace-ltv9va6qk-mr0utkarsh.vercel.app,http://localhost:5174
+    (CORS_ORIGINS works as an alias)
+  - JWT_EXPIRES_IN=7d, MAX_FILE_MB=25 (optional)
+- The backend refuses to start in production without an explicit CORS origin.
+
+### Frontend (Vercel)
+- Root directory: `SYNCSPACE/frontend`
+- Build command: `npm run build` (Vite)
+- Environment (Project -> Settings -> Environment Variables, then REDeploy):
+  - VITE_API_URL=https://YOUR-DEPLOYED-BACKEND-URL  (no trailing slash; this
+    is the Render/Railway origin and is used for BOTH REST and Socket.IO)
+- If VITE_API_URL is missing in a production build the app logs a clear error
+  instead of silently calling the Vercel origin.
+
+### Deployment verification
+- `curl https://YOUR-DEPLOYED-BACKEND-URL/api/health` -> `{"success":true,...}`
+- Open the Vercel site, register on two devices, create a room on device A,
+  join with the room code on device B: membership and presence both come from
+  the single PostgreSQL database, and the socket status shows "connected".
 
 ## Installation
 1. Backend: cd backend, npm install

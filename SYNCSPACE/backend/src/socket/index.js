@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
+import { normalizeRoomCode } from "../lib/roomCode.js";
 import prisma from "../lib/prisma.js";
 
 function sanitize(content) {
@@ -44,7 +45,7 @@ export function initSocket(io) {
 
     socket.on("room:join", async ({ roomCode } = {}, ack) => {
       try {
-        const code = String(roomCode ?? "").trim().toUpperCase();
+        const code = normalizeRoomCode(roomCode);
         if (!code) throw new Error("Room ID is required.");
         const room = await prisma.room.findUnique({ where: { roomCode: code } });
         if (!room) throw new Error("Room not found.");
@@ -94,7 +95,7 @@ export function initSocket(io) {
     }
 
     socket.on("room:leave", async ({ roomCode } = {}, ack) => {
-      const code = String(roomCode ?? "").trim().toUpperCase();
+      const code = normalizeRoomCode(roomCode);
       if (code) await leaveRoomCode(code, true);
       if (typeof ack === "function") ack({ ok: true });
     });
@@ -109,7 +110,7 @@ export function initSocket(io) {
     socket.on("webrtc:ice-candidate", forward("webrtc:ice-candidate"));
 
     socket.on("media:state", ({ roomCode, audio, video, screening } = {}) => {
-      const code = String(roomCode ?? "").trim().toUpperCase();
+      const code = normalizeRoomCode(roomCode);
       if (!code) return;
       const map = rooms.get(code);
       const entry = map?.get(socket.id);
@@ -127,7 +128,7 @@ export function initSocket(io) {
     });
 
     socket.on("screen:start", ({ roomCode } = {}) => {
-      const code = String(roomCode ?? "").trim().toUpperCase();
+      const code = normalizeRoomCode(roomCode);
       if (!code) return;
       const map = rooms.get(code);
       const entry = map?.get(socket.id);
@@ -136,7 +137,7 @@ export function initSocket(io) {
     });
 
     socket.on("screen:stop", ({ roomCode } = {}) => {
-      const code = String(roomCode ?? "").trim().toUpperCase();
+      const code = normalizeRoomCode(roomCode);
       if (!code) return;
       const map = rooms.get(code);
       const entry = map?.get(socket.id);
@@ -146,7 +147,7 @@ export function initSocket(io) {
 
     socket.on("chat:message", async ({ roomCode, content } = {}, ack) => {
       try {
-        const code = String(roomCode ?? "").trim().toUpperCase();
+        const code = normalizeRoomCode(roomCode);
         const text = sanitize(content);
         if (!code || !text) throw new Error("Message content is required.");
         const room = await prisma.room.findUnique({ where: { roomCode: code } });
@@ -170,19 +171,19 @@ export function initSocket(io) {
     });
 
     socket.on("whiteboard:stroke", ({ roomCode, stroke } = {}) => {
-      const code = String(roomCode ?? "").trim().toUpperCase();
+      const code = normalizeRoomCode(roomCode);
       if (!code || !stroke) return;
       socket.to(code).emit("whiteboard:stroke", { stroke, from: socket.id });
     });
 
     socket.on("whiteboard:clear", ({ roomCode } = {}) => {
-      const code = String(roomCode ?? "").trim().toUpperCase();
+      const code = normalizeRoomCode(roomCode);
       if (!code) return;
       socket.to(code).emit("whiteboard:clear", { from: socket.id });
     });
 
     socket.on("file:shared", ({ roomCode, file } = {}) => {
-      const code = String(roomCode ?? "").trim().toUpperCase();
+      const code = normalizeRoomCode(roomCode);
       if (!code || !file) return;
       io.to(code).emit("file:shared", { file, sharedBy: { id: socket.user.id, name: socket.user.name } });
     });

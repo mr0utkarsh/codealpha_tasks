@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Files, MessageSquare, Mic, MicOff, MonitorUp, MonitorOff, Palette, PhoneOff, Users, Video, VideoOff } from "lucide-react";
-import api from "../lib/api.js";
+import api, { normalizeRoomCode } from "../lib/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import useRoom from "../webrtc/useRoom.js";
@@ -19,7 +19,7 @@ export function statusStyle(status) {
 }
 export default function Room() {
   const { roomCode = "" } = useParams();
-  const code = roomCode.toUpperCase();
+  const code = normalizeRoomCode(roomCode);
   const { user } = useAuth();
   const { error, success } = useToast();
   const nav = useNavigate();

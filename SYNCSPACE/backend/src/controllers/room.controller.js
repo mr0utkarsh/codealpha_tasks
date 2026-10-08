@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { ApiError } from "../lib/ApiError.js";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import prisma from "../lib/prisma.js";
+import { normalizeRoomCode } from "../lib/roomCode.js";
 import { created, noContent, ok } from "../lib/respond.js";
 
 function generateRoomCode() {
@@ -18,7 +19,7 @@ async function uniqueRoomCode() {
 }
 
 async function requireMembership(roomCode, userId) {
-  const room = await prisma.room.findUnique({ where: { roomCode } });
+  const room = await prisma.room.findUnique({ where: { roomCode: normalizeRoomCode(roomCode) } });
   if (!room) throw ApiError.notFound("Room not found.");
   const membership = await prisma.roomParticipant.findUnique({ where: { roomId_userId: { roomId: room.id, userId } } });
   if (!membership) throw ApiError.forbidden("You are not a member of this room.");
@@ -69,7 +70,7 @@ export const getRoom = asyncHandler(async (req, res) => {
 });
 
 export const deleteRoom = asyncHandler(async (req, res) => {
-  const room = await prisma.room.findUnique({ where: { roomCode: req.params.roomCode } });
+  const room = await prisma.room.findUnique({ where: { roomCode: normalizeRoomCode(req.params.roomCode) } });
   if (!room) throw ApiError.notFound("Room not found.");
   if (room.ownerId !== req.user.id) throw ApiError.forbidden("Only the room owner can delete this room.");
   await prisma.room.delete({ where: { id: room.id } });
@@ -77,7 +78,7 @@ export const deleteRoom = asyncHandler(async (req, res) => {
 });
 
 export const joinRoom = asyncHandler(async (req, res) => {
-  const { roomCode } = req.params;
+  const roomCode = normalizeRoomCode(req.params.roomCode);
   const room = await prisma.room.findUnique({ where: { roomCode } });
   if (!room) throw ApiError.notFound("Room not found. Check the room ID and try again.");
   await prisma.roomParticipant.upsert({
@@ -93,7 +94,7 @@ export const joinRoom = asyncHandler(async (req, res) => {
 });
 
 export const leaveRoom = asyncHandler(async (req, res) => {
-  const room = await prisma.room.findUnique({ where: { roomCode: req.params.roomCode } });
+  const room = await prisma.room.findUnique({ where: { roomCode: normalizeRoomCode(req.params.roomCode) } });
   if (!room) throw ApiError.notFound("Room not found.");
   await prisma.roomParticipant.updateMany({
     where: { roomId: room.id, userId: req.user.id },
