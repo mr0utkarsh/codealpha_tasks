@@ -66,11 +66,12 @@ Thumbs.db
 *.swp
 
 # ---------------------------------------------------------------------------
-# Deployment and hosting
+# Deployment and hosting (local CLI state only - committed service configs
+# like SYNCSPACE/backend/railway.json MUST stay tracked so hosts pick them up)
 # ---------------------------------------------------------------------------
 .vercel
 .netlify
 .wrangler
 .render
-railway.json
+/.railway
 railway.toml
